@@ -36,11 +36,12 @@ export class FileProcessingService implements OnModuleInit {
     this.logger.log('tests');
     const pathTestFile = path.join(this.folderToRead, 'test.csv');
     const pathTestFile2 = path.join(this.folderToRead, 'test2.csv');
-    // !fs.existsSync(pathTestFile) && (await this.createTestFile(pathTestFile));
+
+    !fs.existsSync(pathTestFile) && (await this.createTestFile(pathTestFile));
 
     await Promise.all([
       this.readFile(pathTestFile),
-      this.readFile(pathTestFile2),
+      //this.readFile(pathTestFile2),
     ]);
   }
 
@@ -81,34 +82,37 @@ export class FileProcessingService implements OnModuleInit {
 
   private readFile(pathFile: string) {
     this.logger.log('readFile');
-    return new Promise((resolve, rejects) => {
+    this.logger.debug({ pathFile });
+
+    return new Promise<void>((resolve, reject) => {
       const readStream = fs.createReadStream(pathFile);
 
       const rl = readline.createInterface({
         input: readStream,
       });
 
+
+      this.logger.debug('Before build the customEmitter')
+      this.logMemoryUsage();
+
       // const customEmitter = CustomEmitter.getNewCustomEmitter(this.logger);
       const customEmitter = new CustomEmitter(this.logger);
 
-      customEmitter.on('error', () => {
-        rejects(error);
+      customEmitter.on('error', (error) => {
+        reject(error);
       });
 
-      this.logMemoryUsage();
 
       rl.on('line', (input) => {
         //   this.logger.log('readLine.on.line');
         //   this.logMemoryUsage();
         customEmitter.emit(EVENT_NAMES.newLine, input);
-
-        // this.logMemoryUsage();
       });
 
       rl.on('error', (error) => {
         // this.logger.error(JSON.stringify(error));
         // this.logger.debug(rl.line);
-        rejects(error);
+        reject(error);
       });
 
       rl.on('close', () => {
@@ -118,7 +122,7 @@ export class FileProcessingService implements OnModuleInit {
 
       customEmitter.on(EVENT_NAMES.completeExecution, () => {
         this.logger.log(`customEmitter.${EVENT_NAMES.completeExecution}`);
-        resolve(true);
+        resolve();
       });
     });
   }
