@@ -15,12 +15,12 @@ export class CustomEmitter extends EventEmitter {
   currentNewLines: string[] = [];
   matrixOfNewLines: string[][] = [];
   arrayTerminated: number[] = [];
-  private maximunLinesCap: number;
+   private maximunLinesCap: number;
 
   constructor(logger: Logger, maximunLinesCap?: 100) {
     super();
     this.logger = logger;
-    this.maximunLinesCap = maximunLinesCap;
+    this.maximunLinesCap = 100;
 
     this.on(EVENT_NAMES.newLine, (newLine: string) => {
       //   customEmitter.logger.log(EVENT_NAMES.newLine);

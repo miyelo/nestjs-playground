@@ -28,8 +28,8 @@ export class FileProcessingService implements OnModuleInit {
     this.initFolders();
   }
   async onModuleInit() {
-    this.logger.log('onModuleInit');
-    await this.tests();
+    // this.logger.log('onModuleInit');
+    // await this.tests();
   }
 
   private async tests() {
